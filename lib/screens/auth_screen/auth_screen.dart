@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:bm_qrcode_windows/widgets/dialog_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ionicons/ionicons.dart';
@@ -91,7 +90,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             loading = true;
                           });
                           try{
-                            await FirebaseAuth.instance.signInWithEmailAndPassword(email: controllerEmail.text, password: controllerPass.text);
+                            //await FirebaseAuth.instance.signInWithEmailAndPassword(email: controllerEmail.text, password: controllerPass.text);
                           } catch (e){
                             setState(() {
                               loading = false;

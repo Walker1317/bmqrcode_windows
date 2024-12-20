@@ -15,6 +15,7 @@ class Cupom {
   String? text;
   Timestamp? validation;
   Timestamp? created;
+  String? collection;
 
   Cupom({
     this.id,
@@ -27,6 +28,7 @@ class Cupom {
     this.text,
     this.validation,
     this.created,
+    this.collection,
   });
 
   Map<String, dynamic> toMap() {
@@ -41,6 +43,7 @@ class Cupom {
       'text': text,
       'validation': validation,
       'created': created,
+      'collection': collection,
     };
   }
 
@@ -56,7 +59,12 @@ class Cupom {
       text: map['text'] != null ? map['text'] as String : null,
       validation: map['validation'] != null ? map['validation'] as Timestamp : null,
       created: map['created'] != null ? map['created'] as Timestamp : null,
+      collection: map['collection'] != null ? map['collection'] as String : null,
     );
+  }
+
+  String toPrintString(){
+    return "${value!.replaceAll("/", "\t")}\t$reference\t$sequence";
   }
 
   String toJson() => json.encode(toMap());
