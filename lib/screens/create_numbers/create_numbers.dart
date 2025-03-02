@@ -28,54 +28,71 @@ class _CreateNumbersState extends State<CreateNumbers> {
   int? savedsLength;
   int saveds = 0;
   int errors = 0;
+  List<int> trueNumbers = List.generate(10001, (index) => index);
+  List<int> usedNumbers = [];
 
-  generateNumbers(int length, int digits) async {
+  generateNumbers(int length,) async {
     List<Cupom> currentValues = [];
+    bool error = false;
+    int quantity = 0;
+    final allValues = shuffleList(trueNumbers);
     for (int index = 0; index < length; index++) {
-      String status = "";
-      List<String> numbers;
-
-      // Repete o processo até que não haja números repetidos
-      do {
-        status = "";
-        numbers = [];
-
-        for (int i = 0; i < digits; i++) {
-          String randomNumber = (100 + Random().nextInt(9900)).toString().padLeft(4, '0');
-          if (numbers.contains(randomNumber)) {
-            status = "Numeros Repetidos";
-          }
-          numbers.add(randomNumber);
+      List<int> numbers = [];
+      for(int i = 0; i < digits; i++){
+        try{
+          numbers.add(allValues.last);
+          allValues.removeLast();
+        } catch (e){
+          error = true;
+          quantity = quantity + 1;
         }
-      } while (status == "Numeros Repetidos");
-
-      // Formata os números e cria o objeto Cupom
-      String value = numbers.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(" ", "").replaceAll(",", "/");
-      String id = FirebaseFirestore.instance.collection("cupons").doc().id;
-      currentValues.add(
-        Cupom(
-          id: "$digits$id",
-          value: value,
-          reference: controllerReferencia.text,
-          digits: digits,
-          status: status,
-          created: Timestamp.now(),
-          sequence: index + 1,
-          collection: widget.collection.id,
-        ),
-      );
+      }
+      if(!error){
+        //trueNumbers.removeRange(0, digits);
+        String value = numbers.map((e)=>e.toString().padLeft(4, "0")).toList().toString().replaceAll("[", "").replaceAll("]", "").replaceAll(" ", "").replaceAll(",", "/");
+        String id = FirebaseFirestore.instance.collection("cupons").doc().id;
+        currentValues.add(
+          Cupom(
+            id: "$digits$id",
+            value: value,
+            reference: controllerReferencia.text,
+            digits: digits,
+            status: "",
+            created: Timestamp.now(),
+            sequence: index + 1,
+            collection: widget.collection.id,
+          ),
+        );
+      }
     }
-
     // Atualiza o estado com os valores gerados
+    if(error){
+      DialogServices.alertDialog(context, "Não há mais números disponíveis para serem gerados.\nNúmeros faltando: $quantity");
+    }
     setState(() {
       values = currentValues;
     });
+  }
+
+
+  List<int> shuffleList(List<int> list) {
+    final random = Random();
+    List<int> shuffled = List.from(list);
+    // Embaralha a lista
+    for (int i = shuffled.length - 1; i > 0; i--) {
+      int j = random.nextInt(i + 1);
+      int temp = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = temp;
+    }
+    return shuffled;
   }
 
   @override
   void initState() {
     super.initState();
     controllerCollection.text = widget.collection.name!;
+    controllerLength.text = 5000.toString();
   }
 
   @override
@@ -156,6 +173,17 @@ class _CreateNumbersState extends State<CreateNumbers> {
                           onSelectionChanged: (value){
                             setState(() {
                               digits = value.first;
+                              switch (digits) {
+                                case 2:
+                                  controllerLength.text = 5000.toString();
+                                case 3:
+                                  controllerLength.text = 3333.toString();
+                                case 4:
+                                  controllerLength.text = 2500.toString();
+                                case 6:
+                                  controllerLength.text = 1666.toString();
+                                default:
+                              }
                             });
                           },
                           segments: const [
@@ -171,6 +199,7 @@ class _CreateNumbersState extends State<CreateNumbers> {
                     const SizedBox(width: 20,),
                     Flexible(
                       child: TextFormField(
+                        readOnly: true,
                         controller: controllerLength,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
@@ -223,7 +252,7 @@ class _CreateNumbersState extends State<CreateNumbers> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if(formKey.currentState!.validate()){
-                            generateNumbers(int.parse(controllerLength.text), digits);
+                            generateNumbers(int.parse(controllerLength.text));
                           }
       
                           /*if(formKey.currentState!.validate()){
