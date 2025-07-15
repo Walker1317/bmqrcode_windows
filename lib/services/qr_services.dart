@@ -11,7 +11,7 @@ class QrServices {
 
   Future<void> generateAndSaveQRCodes(CupomCollection collection, int digits) async {
     // Obtém o diretório padrão para salvar os arquivos
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getDownloadsDirectory();
 
     QuerySnapshot snapshots = await FirebaseFirestore.instance.collection("cupons").where("collection", isEqualTo: collection.id)
     .where("digits", isEqualTo: digits)
@@ -38,7 +38,7 @@ class QrServices {
       final pngBytes = byteData!.buffer.asUint8List();
 
       // Salva o arquivo no diretório
-      final filePath = '${directory.path}/${cupom.sequence}.png';
+      final filePath = '${directory!.path}\\${cupom.sequence}.png';
       final file = File(filePath);
       await file.writeAsBytes(pngBytes);
 
@@ -61,8 +61,8 @@ class QrServices {
     }
 
     // Obter o diretório onde salvar o arquivo (funciona para dispositivos móveis)
-    final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/items-${items.first.digits}digitos.txt';
+    final directory = await getDownloadsDirectory();
+    final filePath = '${directory!.path}\\items-${items.first.digits}digitos.txt';
 
     // Criar o arquivo e escrever o conteúdo
     final file = File(filePath);

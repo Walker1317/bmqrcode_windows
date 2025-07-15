@@ -4,6 +4,7 @@ import 'package:bm_qrcode_windows/models/cupom.dart';
 import 'package:bm_qrcode_windows/screens/create_numbers/create_numbers.dart';
 import 'package:bm_qrcode_windows/services/create_collection.dart';
 import 'package:bm_qrcode_windows/services/delete_collection.dart';
+import 'package:bm_qrcode_windows/services/pdf_services.dart';
 import 'package:bm_qrcode_windows/services/qr_services.dart';
 import 'package:bm_qrcode_windows/widgets/dialog_services.dart';
 import 'package:bm_qrcode_windows/widgets/qrcode_details.dart';
@@ -207,7 +208,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text("QRCodes gerados na pasta \"Documentos\" do seu computador."),
+                                      content: const Text("QRCodes gerados na pasta \"Downloads\" do seu computador."),
                                       backgroundColor: Colors.greenAccent[700],
                                       duration: const Duration(seconds: 3),
                                     ),
@@ -234,7 +235,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text("Texto gerado na pasta \"Documentos\" do seu computador."),
+                                      content: const Text("Texto gerado na pasta \"Downloads\" do seu computador."),
                                       backgroundColor: Colors.greenAccent[700],
                                       duration: const Duration(seconds: 3),
                                     ),
@@ -250,6 +251,34 @@ class _BaseScreenState extends State<BaseScreen> {
                                   Icon(Ionicons.document_text_outline, color: Colors.blueAccent[700],),
                                   const SizedBox(width: 5,),
                                   Text("Gerar Texto", style: TextStyle(color: Colors.blueAccent[700]),)
+                                ],
+                              )
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                DialogServices.loading2(context);
+                                final gerador = GeradorCuponsPDF(currentCollection!, digitsList[currentPage]);
+                                gerador.gerarPDF()
+                                .then((_){
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text("PDF gerado na pasta \"Downloads\" do seu computador."),
+                                      backgroundColor: Colors.greenAccent[700],
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                  );
+                                })/*.catchError((e){
+                                  Navigator.pop(context);
+                                  DialogServices.alertDialog(context, "Erro eu gerar Documento PDF:\n\n$e");
+                                })*/;
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.picture_as_pdf_outlined, color: Colors.redAccent[400],),
+                                  const SizedBox(width: 5,),
+                                  Text("Gerar PDF", style: TextStyle(color: Colors.redAccent[400]),)
                                 ],
                               )
                             ),

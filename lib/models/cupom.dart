@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -16,6 +17,7 @@ class Cupom {
   Timestamp? validation;
   Timestamp? created;
   String? collection;
+  Uint8List? qr;
 
   Cupom({
     this.id,
@@ -29,6 +31,7 @@ class Cupom {
     this.validation,
     this.created,
     this.collection,
+    this.qr
   });
 
   Map<String, dynamic> toMap() {
